@@ -16,7 +16,7 @@
 - Git (code versioning)
 
 ### Execute 
-Vá ao diretório raiz e execute no terminal:
+Vá ao diretório raiz da aplicação Java e execute no terminal:
 ```
 $ docker compose up -d
 ```
