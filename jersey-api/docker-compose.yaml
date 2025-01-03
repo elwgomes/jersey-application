@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: jersey_api_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jersey_api_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  maven:
+    image: maven:3.8.8-eclipse-temurin-17 # Substituído pela imagem correta
+    container_name: jersey_api_maven
+    working_dir: /app
+    volumes:
+      - ./ProjetoAPIRestJersey:/app
+      - ./webapps:/output
+    networks:
+      - app-network
+    command: >
+      bash -c "mvn clean package && cp target/*.war /output"
+
+  tomcat:
+    image: tomcat:10.1
+    container_name: jersey_api_tomcat
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./webapps:/usr/local/tomcat/webapps
+    networks:
+      - app-network
+    environment:
+      - JAVA_OPTS=-Dspring.datasource.url=jdbc:postgresql://postgres:5432/jersey_api_db
+      - JAVA_OPTS=-Dspring.datasource.username=postgres
+      - JAVA_OPTS=-Dspring.datasource.password=postgres
+
+volumes:
+  postgres-data:
+
+networks:
+  app-network:
+    driver: bridge
